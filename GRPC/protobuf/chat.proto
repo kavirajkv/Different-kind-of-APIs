@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./proto";
+
+service ChatService {
+  rpc GetUserInfo(UserId) returns (UserInfo);              
+  rpc SendMessage(stream Message) returns (Status);       
+  rpc ReceiveMessage(UserId) returns (stream Message);     
+  rpc Chat(stream Message) returns (stream Message);       
+}
+
+message UserId {
+  int32 id = 1;
+}
+
+message UserInfo {
+  int32 id = 1;
+  string name = 2;
+}
+
+message Message {
+  int32 senderid = 1;
+  int32 receiverid = 2; 
+  string msg = 3;
+  int64 time = 4;
+}
+
+message Status {
+  string status = 1;
+}
+
+
+//this proto contains unary, bidirectional and client/ server steaming api implementations
