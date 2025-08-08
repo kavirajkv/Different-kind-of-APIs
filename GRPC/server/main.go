@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"io"
 
 	proto "github.com/kavirajkv/api-types/GRPC/protobuf/proto"
 	"google.golang.org/grpc"
@@ -21,6 +22,22 @@ func (s *server) GetUserInfo(ctx context.Context, req *proto.UserId) (*proto.Use
 	}
 	log.Printf("Received request for userid: %v", req.Id)
 	return &proto.UserInfo{Id: req.Id, Name: "John"}, nil
+
+}
+
+func (s *server) SendMessage(stream proto.ChatService_SendMessageServer) error {
+	for{
+		req,err:=stream.Recv()
+		if err==io.EOF{
+			return stream.SendAndClose(&proto.Status{Status: "Messages received successfully"})
+		}
+		if err!=nil{
+			log.Fatalf("Error receiving messages %s",err.Error())
+			return err
+		}
+		log.Printf("Message received from %v to %v at %v",req.Senderid,req.Receiverid,req.Time)
+		log.Println("Message received: ",req.Msg)
+	}
 
 }
 
