@@ -2,9 +2,10 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"net"
-	"io"
+	"time"
 
 	proto "github.com/kavirajkv/api-types/GRPC/protobuf/proto"
 	"google.golang.org/grpc"
@@ -39,6 +40,18 @@ func (s *server) SendMessage(stream proto.ChatService_SendMessageServer) error {
 		log.Println("Message received: ",req.Msg)
 	}
 
+}
+
+func (s *server)ReceiveMessage(req *proto.UserId, stream proto.ChatService_ReceiveMessageServer)error{
+	for x:=range 3{
+		res:=&proto.Message{Senderid: int32(x),Receiverid: req.Id,Msg: "hello",Time: time.Now().Unix()}
+		err:=stream.Send(res)
+		if err!=nil{
+			log.Fatalln(err.Error())
+		}
+		time.Sleep(2*time.Second)
+	}
+	return nil
 }
 
 func main() {
