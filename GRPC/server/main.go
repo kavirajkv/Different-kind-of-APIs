@@ -54,6 +54,24 @@ func (s *server)ReceiveMessage(req *proto.UserId, stream proto.ChatService_Recei
 	return nil
 }
 
+func (s *server)Chat(stream proto.ChatService_ChatServer)error{
+	for {
+		req,err:=stream.Recv()
+		if err==io.EOF{
+			log.Print("Messages received")
+			return  nil
+		}
+		if err!=nil{
+			log.Fatalln(err.Error())
+		}
+		log.Printf("Got message from %v : %s",req.Senderid,req.Msg)
+		er:=stream.Send(&proto.Message{Senderid: 1,Receiverid: req.Receiverid,Msg: "hello",Time: time.Now().Unix()})
+		if er!=nil{
+			log.Fatal(er.Error())
+		}
+	}
+}
+
 func main() {
 	lis, err := net.Listen("tcp", ":8000")
 	if err != nil {
